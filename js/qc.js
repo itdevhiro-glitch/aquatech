@@ -1,15 +1,5 @@
-// Check authentication before loading the page
-if (!isLoggedIn()) {
-    showLoginModal();
-}
-
-// Logout handler
-window.handleLogout = function() {
-    logout();
-    window.location.href = 'index.html';
-};
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -23,6 +13,20 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Check authentication state
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        showLoginModal();
+    }
+});
+
+// Logout handler
+window.handleLogout = function() {
+    logout();
+};
+
 let allDataCache = [];
 let currentGradeFilter = 'ALL';
 
