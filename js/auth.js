@@ -1,56 +1,63 @@
-// Simple Authentication System using localStorage
-const AUTH_KEY = 'ATLANTIS_ADMIN_AUTH';
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'atlantis123'; // In production, use proper backend auth
+// Firebase Authentication System
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDxZvpKrQ236bCTOLSzoMrHRR8BINTI-Sw",
+    authDomain: "atlantiscorp-af211.firebaseapp.com",
+    projectId: "atlantiscorp-af211",
+    storageBucket: "atlantiscorp-af211.firebasestorage.app",
+    messagingSenderId: "36612462515",
+    appId: "1:36612462515:web:7683c3b686d308450addc6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+// Monitor authentication state changes
+onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user) {
+        closeLoginModal();
+    }
+});
 
 // Check if user is logged in
 function isLoggedIn() {
-    const authData = localStorage.getItem(AUTH_KEY);
-    if (!authData) return false;
-    try {
-        const data = JSON.parse(authData);
-        return data.isAuthenticated === true && data.timestamp > (Date.now() - 24*60*60*1000); // 24 hour session
-    } catch (e) {
-        return false;
-    }
+    return currentUser !== null;
 }
 
-// Login function
-function login(username, password) {
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        const authData = {
-            isAuthenticated: true,
-            username: username,
-            timestamp: Date.now()
-        };
-        localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+// Login function using Firebase Authentication
+async function login(email, password) {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return true;
+    } catch (error) {
+        console.error('Login error:', error.code);
+        throw error;
     }
-    return false;
 }
 
 // Logout function
-function logout() {
-    localStorage.removeItem(AUTH_KEY);
-}
-
-// Get current admin info
-function getAdminInfo() {
-    if (!isLoggedIn()) return null;
+async function logout() {
     try {
-        return JSON.parse(localStorage.getItem(AUTH_KEY));
-    } catch (e) {
-        return null;
+        await signOut(auth);
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Logout error:', error);
     }
 }
 
-// Check auth and redirect if not logged in
-function checkAuthAndRedirect() {
-    if (!isLoggedIn()) {
-        window.location.href = window.location.pathname + '?login=required';
-        return false;
-    }
-    return true;
+// Get current user info
+function getCurrentUser() {
+    return currentUser;
+}
+
+// Get user email
+function getUserEmail() {
+    return currentUser?.email || null;
 }
 
 // Show login modal
@@ -70,20 +77,49 @@ function closeLoginModal() {
 }
 
 // Handle login form submission
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
-    const username = document.getElementById('loginUsername')?.value || '';
+    const email = document.getElementById('loginUsername')?.value || '';
     const password = document.getElementById('loginPassword')?.value || '';
     const errorMsg = document.getElementById('loginError');
+    const loginBtn = event.target.querySelector('button[type="submit"]');
 
-    if (login(username, password)) {
+    if (!email || !password) {
+        if (errorMsg) {
+            errorMsg.textContent = 'Email dan password harus diisi!';
+        }
+        return;
+    }
+
+    try {
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Loading...';
+        
+        await login(email, password);
         closeLoginModal();
         window.location.href = window.location.pathname;
-    } else {
+    } catch (error) {
         if (errorMsg) {
-            errorMsg.textContent = 'Username atau password salah!';
+            switch(error.code) {
+                case 'auth/invalid-email':
+                    errorMsg.textContent = 'Format email tidak valid!';
+                    break;
+                case 'auth/user-not-found':
+                    errorMsg.textContent = 'Email tidak terdaftar!';
+                    break;
+                case 'auth/wrong-password':
+                    errorMsg.textContent = 'Password salah!';
+                    break;
+                case 'auth/too-many-requests':
+                    errorMsg.textContent = 'Terlalu banyak percobaan login. Coba lagi nanti.';
+                    break;
+                default:
+                    errorMsg.textContent = 'Gagal login. Silakan coba lagi.';
+            }
         }
-        console.log('Login failed');
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
     }
 }
 
