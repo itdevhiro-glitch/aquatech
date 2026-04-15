@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLANTIS POS - Premium System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/transaksi.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="login-container">
+            <div class="login-header">
+                <h2><i class="fas fa-lock" style="color: #0ea5e9; margin-right: 10px;"></i> Admin Login</h2>
+                <p>Silakan login untuk mengakses sistem POS Transaksi</p>
+            </div>
+            <div id="loginError"></div>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Masukkan username" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="login-button">
+                    <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Login
+                </button>
+            </form>
+            <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <p style="font-size: 12px; color: #64748b; margin: 0;">
+                    Demo Username: <strong>admin</strong> | Password: <strong>atlantis123</strong>
+                </p>
+                <a href="index.html" style="color: #0ea5e9; text-decoration: none; font-weight: 700; font-size: 13px;">← Kembali ke Store</a>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="sidebar">
+        <div class="brand-logo"><i class="fas fa-cash-register"></i> ATLANTIS<span>POS</span></div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <button class="nav-link active" style="flex: 1;" onclick="showPage('inventoryPage', this)"><i class="fas fa-boxes"></i> Inventory & Sales</button>
+            <a href="index.html" class="nav-button" title="Back to Store" style="font-size: 12px; padding: 8px 12px;">
+                <i class="fas fa-arrow-left"></i> Store
+            </a>
+        </div>
+        <button class="nav-link" onclick="showPage('historyPage', this)"><i class="fas fa-history"></i> Transaction History</button>
+        <button class="nav-link" onclick="showPage('appsPage', this)"><i class="fas fa-layer-group"></i> Software Library</button>
+        <hr style="width: 100%; border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
+        <a href="qc.html" class="nav-link"><i class="fas fa-clipboard-check"></i> Go to QC</a>
+        <button onclick="handleLogout()" class="logout-button" style="width: 100%; margin-top: auto;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </nav>
+
+    <main class="main-content">
+        <div id="inventoryPage" class="page active">
+            <div class="header-section">
+                <h1>Inventory & POS</h1>
+                <p>Kelola unit dan proses penjualan unit.</p>
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model / SN</th>
+                            <th>QC Grade</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="historyPage" class="page">
+            <div class="header-section">
+                <h1>Riwayat Transaksi</h1>
+                <p>Klik baris untuk melihat detail invoice.</p>
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No. Invoice</th>
+                            <th>Tanggal</th>
+                            <th>Customer</th>
+                            <th>Total Bayar</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="appsPage" class="page">
+            <div class="header-section">
+                <h1>Software Library</h1>
+                <p>Koleksi sistem operasi, aplikasi, dan game untuk bundle penjualan.</p>
+            </div>
+            <div class="card">
+                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 200px;">
+                        <label>Nama Item</label>
+                        <input type="text" id="appName" placeholder="Contoh: Office 2021" style="margin-bottom:0">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label>Kategori</label>
+                        <select id="appType" style="margin-bottom:0">
+                            <option value="OS">Operating System</option>
+                            <option value="App">Software/App</option>
+                            <option value="Game">Video Games</option>
+                            <option value="Driver">Drivers & Utility</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveApp()" style="height: 48px;">Tambah Koleksi</button>
+                </div>
+            </div>
+            <div id="appsListContainer"></div>
+        </div>
+    </main>
+
+    <div id="modalOverlay">
+        <div class="modal-content" style="width: 400px;">
+            <h3 style="margin-top:0">Update Data Unit</h3>
+            <label>Harga Jual Dasar (IDR)</label>
+            <input type="number" id="unitPrice">
+            <label>Status Inventaris</label>
+            <select id="unitStatus">
+                <option value="Ready">Ready for Sale</option>
+                <option value="Repair">Under Repair</option>
+                <option value="Sold">Sold</option>
+            </select>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+                <button class="btn btn-primary" onclick="updateUnit()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appPromptOverlay">
+        <div class="modal-content">
+            <h2 style="margin-top:0"><i class="fas fa-file-invoice-dollar" style="color:var(--success)"></i> Invoice Builder</h2>
+            <div class="section-title"><i class="fas fa-user"></i> Data Customer</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div><label>Nama Lengkap</label><input type="text" id="custName"></div>
+                <div><label>WhatsApp</label><input type="text" id="custWA"></div>
+            </div>
+            <div class="section-title"><i class="fas fa-tags"></i> Penyesuaian</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div><label>Diskon (%)</label><input type="number" id="invDiscount" value="0"></div>
+                <div><label>Masa Garansi</label><input type="text" id="invWarranty" value="30 Hari"></div>
+            </div>
+            <div class="section-title"><i class="fas fa-microchip"></i> Sistem Operasi</div>
+            <div id="osOptions" class="grid-options"></div>
+            <div class="section-title"><i class="fas fa-th-large"></i> Software Bundles</div>
+            <div id="appOptions" class="grid-options"></div>
+            <div class="section-title"><i class="fas fa-gamepad"></i> Game Installed</div>
+            <div id="gameOptions" class="grid-options"></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px;">
+                <button class="btn btn-ghost" onclick="closeAppPrompt()">Batal</button>
+                <button class="btn btn-success" id="btnProcessInvoice" onclick="processInvoice()">Cetak & Simpan <i class="fas fa-check-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailOverlay">
+        <div class="modal-content" style="width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <h2 style="margin:0; color:var(--accent);">Transaction Detail</h2>
+                <button class="btn btn-ghost" onclick="closeDetail()" style="padding: 5px 10px;"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="detailContent"></div>
+            <div style="margin-top: 25px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="closeDetail()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script type="module" src="js/transaksi.js"></script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLANTIS QC Enterprise - Cloud System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/qc.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="login-container">
+            <div class="login-header">
+                <h2><i class="fas fa-lock" style="color: #0ea5e9; margin-right: 10px;"></i> Admin Login</h2>
+                <p>Silakan login untuk mengakses sistem QC Enterprise</p>
+            </div>
+            <div id="loginError"></div>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Masukkan username" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="login-button">
+                    <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Login
+                </button>
+            </form>
+            <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <p style="font-size: 12px; color: #64748b; margin: 0;">
+                    Demo Username: <strong>admin</strong> | Password: <strong>atlantis123</strong>
+                </p>
+                <a href="index.html" style="color: #0ea5e9; text-decoration: none; font-weight: 700; font-size: 13px;">← Kembali ke Store</a>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="sidebar">
+        <div class="brand-logo"><i class="fas fa-shield-virus"></i> ATLANTIS<span>QC</span></div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <button class="nav-link active" style="flex: 1;" onclick="showPage('formPage', this)"><i class="fas fa-plus-square"></i> New Inspection</button>
+            <a href="index.html" class="nav-button" title="Back to Store" style="font-size: 12px; padding: 8px 12px;">
+                <i class="fas fa-arrow-left"></i> Store
+            </a>
+        </div>
+        <div class="nav-link" onclick="showPage('historyPage', this)"><i class="fas fa-database"></i> Cloud Database</div>
+        <div class="nav-link" onclick="showPage('statsPage', this)"><i class="fas fa-chart-pie"></i> Analytics</div>
+        <div style="margin-top: auto; padding: 20px; background: #f8fafc; border-radius: 20px; border: 1px solid var(--border);">
+            <div style="font-size: 11px; font-weight: 800; color: var(--text-dim); margin-bottom: 5px;">SERVER STATUS</div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--success);">
+                <i class="fas fa-circle" style="font-size: 8px;"></i> Connected
+            </div>
+            <button class="logout-button" style="width: 100%; margin-top: 15px;" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+    <main class="main-content">
+        <div id="formPage" class="page active">
+            <div class="header-section">
+                <h1>Unit Inspection</h1>
+                <p>Standard Operating Procedure (SOP) for Laptop Quality Control.</p>
+            </div>
+            <div id="qcInputArea">
+                <div class="card">
+                    <h3><i class="fas fa-info-circle"></i> Unit Specifications</h3>
+                    <div class="form-grid">
+                        <div class="input-wrapper"><label>Brand</label>
+                            <select id="brand">
+                                <optgroup label="Global Brands">
+                                    <option value="Asus">Asus</option>
+                                    <option value="Acer">Acer</option>
+                                    <option value="Lenovo">Lenovo</option>
+                                    <option value="HP">HP</option>
+                                    <option value="Dell">Dell</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="MSI">MSI</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Huawei">Huawei</option>
+                                    <option value="Xiaomi">Xiaomi</option>
+                                    <option value="Microsoft">Microsoft</option>
+                                    <option value="LG">LG</option>
+                                    <option value="Fujitsu">Fujitsu</option>
+                                    <option value="Dynabook">Dynabook (Toshiba)</option>
+                                    <option value="Gigabyte">Gigabyte</option>
+                                    <option value="Razer">Razer</option>
+                                    <option value="Honor">Honor</option>
+                                    <option value="Infinix">Infinix</option>
+                                    <option value="Realme">Realme</option>
+                                    <option value="Google">Google (Chromebook)</option>
+                                </optgroup>
+                                <optgroup label="Local Brands (Indonesia)">
+                                    <option value="Axioo">Axioo</option>
+                                    <option value="Advan">Advan</option>
+                                    <option value="Zyrex">Zyrex</option>
+                                    <option value="Polytron">Polytron</option>
+                                    <option value="Byon">Byon</option>
+                                    <option value="Xenom">Xenom</option>
+                                    <option value="Evercoss">Evercoss</option>
+                                    <option value="SPC">SPC</option>
+                                    <option value="TSM">TSM Technologies</option>
+                                </optgroup>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="input-wrapper"><label>Model Name</label><input id="nama" placeholder="e.g. ThinkPad X1 Carbon"></div>
+                        <div class="input-wrapper"><label>Serial Number</label><input id="sn" placeholder="Unique ID"></div>
+                        <div class="input-wrapper"><label>CPU</label><input id="cpu" placeholder="Intel i7-1260P"></div>
+                        <div class="input-wrapper"><label>RAM</label><input id="ram" placeholder="16GB DDR4"></div>
+                        <div class="input-wrapper"><label>Storage</label><input id="ssd" placeholder="512GB NVMe"></div>
+                        <div class="input-wrapper"><label>OS Installed</label><input id="os" placeholder="Windows 11 Pro / macOS Sonoma"></div>
+                        <div class="input-wrapper"><label>Inspector</label><input id="teknisi" placeholder="Technician Name"></div>
+                        <div class="input-wrapper"><label>Date</label><input id="tanggal" type="date"></div>
+                    </div>
+                </div>
+                <div id="dynamicQC"></div>
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="processQC()">
+                    FINALIZE & SAVE TO CLOUD <i class="fas fa-check-double"></i>
+                </button>
+            </div>
+            <div id="resultArea" style="display:none;">
+                <div class="card" style="text-align: center; padding: 60px;">
+                    <h3 style="justify-content: center;">Final Quality Result</h3>
+                    <div class="grade-display" id="finalGrade">-</div>
+                    <p id="finalScore" style="font-size: 20px; font-weight: 700; color: var(--text-dim);"></p>
+                    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px;">
+                        <button class="btn btn-primary" onclick="generatePerfectPDF()"><i class="fas fa-file-pdf"></i> Export Certificate</button>
+                        <button class="btn btn-secondary" onclick="location.reload()">Inspect Another Unit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="historyPage" class="page">
+            <div class="header-section">
+                <h1>Cloud Database</h1>
+                <p>Enterprise data management & inspection archives.</p>
+            </div>
+            <div class="db-toolbar">
+                <div class="input-wrapper" style="flex: 1; min-width: 250px;">
+                    <input type="text" id="dbSearch" placeholder="Search S/N, Model, or Technician..." onkeyup="runComplexFilter()">
+                </div>
+                <div class="db-nav">
+                    <button class="db-nav-btn active" onclick="filterByGrade('ALL', this)">ALL</button>
+                    <button class="db-nav-btn" onclick="filterByGrade('A+', this)">A+</button>
+                    <button class="db-nav-btn" onclick="filterByGrade('A', this)">A</button>
+                    <button class="db-nav-btn" onclick="filterByGrade('B', this)">B</button>
+                    <button class="db-nav-btn" onclick="filterByGrade('C', this)">C</button>
+                </div>
+                <select id="filterBrand" style="width: auto; padding: 8px 15px;" onchange="runComplexFilter()">
+                    <option value="ALL">All Brands</option>
+                    <option value="Lenovo">Lenovo</option>
+                    <option value="Dell">Dell</option>
+                    <option value="HP">HP</option>
+                    <option value="Asus">Asus</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Axioo">Axioo</option>
+                    <option value="Advan">Advan</option>
+                </select>
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Brand</th>
+                                <th>Model / Series</th>
+                                <th>Serial Number</th>
+                                <th>Inspector</th>
+                                <th>Score</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="statsPage" class="page">
+            <div class="header-section">
+                <h1>Performance Analytics</h1>
+            </div>
+            <div class="form-grid">
+                <div class="card" style="text-align: center;">
+                    <p style="color:var(--text-dim); font-weight: 700;">TOTAL INSPECTED</p>
+                    <h1 id="statTotal" style="font-size: 48px; color: var(--accent);">0</h1>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <p style="color:var(--text-dim); font-weight: 700;">AVG. QUALITY SCORE</p>
+                    <h1 id="statAvg" style="font-size: 48px; color: var(--success);">0</h1>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <p style="color:var(--text-dim); font-weight: 700;">GRADE A RATE</p>
+                    <h1 id="statRate" style="font-size: 48px; color: var(--warning);">0%</h1>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="detailModal">
+        <div class="card" style="width: 90%; max-width: 850px; max-height: 90vh; overflow-y: auto; position: relative; border-radius: 30px;">
+            <button onclick="closeModal()" style="position:absolute; right:25px; top:25px; border:none; background:#f1f5f9; width:40px; height:40px; border-radius:50%; cursor:pointer;"><i class="fas fa-times"></i></button>
+            <h3 style="font-size: 22px;"><i class="fas fa-edit" style="color:var(--accent)"></i> Unit Detail & Update</h3>
+            <hr style="border:0; border-top:1px solid var(--border); margin-bottom:30px;">
+            <div class="form-grid" id="modalForm">
+                <input type="hidden" id="editId">
+                <div class="input-wrapper"><label>Brand</label><input id="editBrand"></div>
+                <div class="input-wrapper"><label>Model</label><input id="editNama"></div>
+                <div class="input-wrapper"><label>Serial Number</label><input id="editSn" readonly style="background:#f1f5f9; cursor:not-allowed;"></div>
+                <div class="input-wrapper"><label>CPU</label><input id="editCpu"></div>
+                <div class="input-wrapper"><label>RAM</label><input id="editRam"></div>
+                <div class="input-wrapper"><label>Storage</label><input id="editSsd"></div>
+                <div class="input-wrapper"><label>OS Installed</label><input id="editOs"></div>
+                <div class="input-wrapper"><label>Inspector</label><input id="editTeknisi"></div>
+                <div class="input-wrapper"><label>Score (0-100)</label><input id="editScore" type="number"></div>
+                <div class="input-wrapper"><label>Grade</label><input id="editGrade"></div>
+                <div class="input-wrapper"><label>Inspection Date</label><input id="editTanggal" type="date"></div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 40px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid var(--border);">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary" style="background:var(--success)" onclick="updateCloudData()"><i class="fas fa-cloud-upload-alt"></i> Save Changes</button>
+                <button class="btn btn-primary" onclick="downloadFromModal()"><i class="fas fa-print"></i> Re-print PDF</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script type="module" src="js/qc.js"></script>
+</body>
+</html>
